@@ -3,7 +3,7 @@ import glob
 import shutil as sh
 import warnings
 import tempfile
-
+pyfits_available = False
 import commands as m
 from status import MontageError
 
@@ -19,8 +19,20 @@ def _finalize(cleanup, work_dir, silence=False):
 
 
 try:
+    try:
+        import pyfits
+        pyfits_available = True
+    except ImportError:
+        pass
 
-    import pyfits
+    try:
+        from astropy.io import fits as pyfits
+        pyfits_available = True
+    except ImportError:
+        pass
+
+    if not pyfits_available: raise ImportError('Neither pyfits nor astropy are available - either one of them is needed')
+
 
     def reproject_hdu(in_hdu, **kwargs):
         '''
